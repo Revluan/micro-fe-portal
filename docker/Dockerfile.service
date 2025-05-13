@@ -2,14 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY . .
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --filter config-service...
-
-WORKDIR /app/services/config-service
-
-RUN pnpm build
+# 只复制构建产物，不再安装依赖或构建
+COPY services/config-service/dist ./dist
+COPY services/config-service/package.json ./
 
 EXPOSE 3000
 

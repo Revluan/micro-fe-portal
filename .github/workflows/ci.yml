@@ -1,35 +1,34 @@
-name: Build and Push Docker Images
+- name: 📦 Set up Node & pnpm
+  uses: actions/setup-node@v3
+  with:
+    node-version: 18
+    cache: 'pnpm'
 
-on:
-  push:
-    branches: [test03]
+- name: 🔧 Enable pnpm
+  run: corepack enable && corepack prepare pnpm@latest --activate
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+- name: 📦 Install dependencies
+  run: pnpm install
 
-    steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+- name: 🔧 Build all frontends
+  run: |
+    pnpm --filter ./apps/portal... build
+    pnpm --filter ./apps/dashboard... build
 
-      - name: 🧰 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+- name: 🔧 Build config-service
+  run: |
+    pnpm --filter ./services/config-service... build
 
-      - name: 🔑 Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+# 然后 Docker 只 COPY 构建结果，而不是重新构建
+- name: 🐳 Build frontend docker image
+  run: |
+    docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest .
 
-      - name: 📦 Build frontend image
-        run: |
-          docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest .
+- name: 🐳 Build service docker image
+  run: |
+    docker build -f docker/Dockerfile.service -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest .
 
-      - name: 📦 Build service image
-        run: |
-          docker build -f docker/Dockerfile.service -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest .
-
-      - name: 📤 Push images to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest
+- name: 📤 Push images
+  run: |
+    docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest
+    docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest
