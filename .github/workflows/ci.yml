@@ -55,5 +55,6 @@ jobs:
 
       - name: 📤 Push images to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-portal:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-dashboard:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest
