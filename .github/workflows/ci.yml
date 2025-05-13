@@ -38,8 +38,11 @@ jobs:
       - name: 🔧 Build config-service
         run: pnpm --filter ./services/config-service... build
 
-      - name: 🐳 Build frontend image
-        run: docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest .
+      - name: 🐳 Build portal image
+        run: docker build -f docker/Dockerfile.portal -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-portal:latest .
+
+      - name: 🐳 Build dashboard image
+        run: docker build -f docker/Dockerfile.dashboard -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-dashboard:latest .
 
       - name: 🐳 Build service image
         run: docker build -f docker/Dockerfile.service -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest .
