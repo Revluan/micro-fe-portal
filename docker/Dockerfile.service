@@ -1,10 +1,29 @@
+# FROM node:18-alpine
+
+# WORKDIR /app
+
+# # 只复制构建产物，不再安装依赖或构建
+# COPY services/config-service/dist ./dist
+# COPY services/config-service/package.json ./
+
+# EXPOSE 3000
+
+# CMD ["node", "dist/main.js"]
+
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 只复制构建产物，不再安装依赖或构建
+# 拷贝构建产物
 COPY services/config-service/dist ./dist
+
+# 拷贝依赖声明
 COPY services/config-service/package.json ./
+COPY services/config-service/pnpm-lock.yaml ./
+COPY .npmrc ./
+
+# 安装生产依赖（必须有 package.json 和 lockfile）
+RUN npm install --omit=dev
 
 EXPOSE 3000
 
