@@ -31,5 +31,5 @@ const RootComponent = ({ basename }: { basename: string }) => {
 export const provider = reactBridge({
   el: '#root',
   rootComponent: RootComponent,
-  errorBoundary: (e: any) => <div>子应用加载失败</div>,
+  errorBoundary: () => <div>子应用加载失败</div>,
 });
