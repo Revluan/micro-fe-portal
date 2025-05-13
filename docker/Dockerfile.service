@@ -2,9 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# 首先复制 package.json 和 package-lock.json
+COPY services/config-service/package*.json ./
+
+# 安装依赖
+RUN npm install
+
+# 复制构建后的代码
 COPY services/config-service/dist ./dist
-COPY services/config-service/package.json ./
-COPY services/config-service/node_modules ./node_modules
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
