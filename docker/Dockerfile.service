@@ -4,6 +4,7 @@ WORKDIR /app
 
 # 只复制构建产物，不再安装依赖或构建
 COPY services/config-service/dist ./dist
+COPY services/config-service/node_modules ./node_modules
 COPY services/config-service/package.json ./
 
 EXPOSE 3000
