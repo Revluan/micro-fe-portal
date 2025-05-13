@@ -25,7 +25,7 @@ jobs:
         run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: 📦 Install dependencies
-        run: pnpm install --ignore-scripts=false
+        run: pnpm install
 
       - name: 🧪 Check pnpm version
         run: pnpm -v
