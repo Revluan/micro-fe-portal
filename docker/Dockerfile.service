@@ -1,0 +1,16 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY . .
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm install --filter config-service...
+
+WORKDIR /app/services/config-service
+
+RUN pnpm build
+
+EXPOSE 3000
+
+CMD ["node", "dist/main.js"]
