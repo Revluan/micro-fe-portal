@@ -17,12 +17,18 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
+      
+      - name: 📦 Enable corepack
+        run: corepack enable
 
       - name: 📦 Enable pnpm
         run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: 📦 Install dependencies
         run: pnpm install
+
+      - name: 🧪 Check pnpm version
+        run: pnpm -v
 
       - name: 🔧 Build frontend
         run: |
