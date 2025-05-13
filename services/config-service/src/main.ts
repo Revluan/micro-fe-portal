@@ -1,0 +1,10 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+    // ✅ 启用 CORS，允许所有来源访问
+    app.enableCors()
+  await app.listen(process.env.PORT ?? 3003);
+}
+bootstrap();
