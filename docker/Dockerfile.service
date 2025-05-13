@@ -2,11 +2,18 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 只复制构建产物，不再安装依赖或构建
+# 把 workspace 根部的配置文件复制进去（用于 install）
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# 复制子模块自己的 package.json
+COPY services/config-service/package.json ./services/config-service/
+
+# 安装 config-service 所需依赖
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm install --filter ./services/config-service...
+
+# 复制构建后的 dist 文件
 COPY services/config-service/dist ./dist
-COPY services/config-service/node_modules ./node_modules
-COPY services/config-service/package.json ./
 
 EXPOSE 3000
-
 CMD ["node", "dist/main.js"]
