@@ -1,34 +1,44 @@
-- name: 📦 Set up Node & pnpm
-  uses: actions/setup-node@v3
-  with:
-    node-version: 18
-    cache: 'pnpm'
+name: Build and Push Docker Images
 
-- name: 🔧 Enable pnpm
-  run: corepack enable && corepack prepare pnpm@latest --activate
+on:
+  push:
+    branches: [main]
 
-- name: 📦 Install dependencies
-  run: pnpm install
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
 
-- name: 🔧 Build all frontends
-  run: |
-    pnpm --filter ./apps/portal... build
-    pnpm --filter ./apps/dashboard... build
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
 
-- name: 🔧 Build config-service
-  run: |
-    pnpm --filter ./services/config-service... build
+      - name: 🧱 Set up Node and pnpm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
 
-# 然后 Docker 只 COPY 构建结果，而不是重新构建
-- name: 🐳 Build frontend docker image
-  run: |
-    docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest .
+      - name: 📦 Enable pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
-- name: 🐳 Build service docker image
-  run: |
-    docker build -f docker/Dockerfile.service -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest .
+      - name: 📦 Install dependencies
+        run: pnpm install
 
-- name: 📤 Push images
-  run: |
-    docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest
-    docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest
+      - name: 🔧 Build frontend
+        run: |
+          pnpm --filter ./apps/portal... build
+          pnpm --filter ./apps/dashboard... build
+
+      - name: 🔧 Build config-service
+        run: pnpm --filter ./services/config-service... build
+
+      - name: 🐳 Build frontend image
+        run: docker build -f docker/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest .
+
+      - name: 🐳 Build service image
+        run: docker build -f docker/Dockerfile.service -t ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest .
+
+      - name: 📤 Push images to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/micro-fe-service:latest
